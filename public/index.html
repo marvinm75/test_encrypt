@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Encrypted Messenger</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const socket = io();
+
+      // Elements
+      const messageForm = document.getElementById('message-form');
+      const messageInput = document.getElementById('message');
+      const messageContainer = document.getElementById('message-container');
+      
+      // Get username and room from URL
+      // For simplicity, we're using a prompt. In a real app, consider a proper login form.
+      const username = prompt('Enter your name:');
+      const room = prompt('Enter room:');
+      socket.emit('joinRoom', { username, room });
+
+      socket.on('message', message => {
+        console.log(message);
+        const div = document.createElement('div');
+        div.textContent = message;
+        messageContainer.appendChild(div);
+      });
+
+      messageForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const message = messageInput.value;
+        socket.emit('chatMessage', { message, room });
+        messageInput.value = '';
+      });
+    });
+  </script>
+  
+</head>
+<body>
+  <div id="message-container"></div>
+  <form id="message-form">
+    <input id="message" autocomplete="off" placeholder="Type message..." /><button>Send</button>
+  </form>
+</body>
+</html>
